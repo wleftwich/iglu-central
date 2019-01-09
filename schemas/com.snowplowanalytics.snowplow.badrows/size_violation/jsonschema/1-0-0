@@ -1,0 +1,126 @@
+{
+  "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+  "description": "Schema for a size violation bad row",
+  "self": {
+    "vendor": "com.snowplowanalytics.snowplow.badrows",
+    "name": "size_violation",
+    "format": "jsonschema",
+    "version": "1-0-0"
+  },
+  "type": "object",
+  "properties": {
+    "failure": {
+      "type": "object",
+      "description": "Information regarding the size violation",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp at which the failure occurred",
+          "format": "date-time"
+        },
+        "maximumAllowedSizeBytes": {
+          "type": "integer",
+          "description": "Maximum payload size allowed by the current platform",
+          "maximum": 1073741824,
+          "minimum": 0
+        },
+        "actualSizeBytes": {
+          "type": "integer",
+          "description": "Maximum payload size allowed by the current platform",
+          "maximum": 1073741824,
+          "minimum": 0
+        }
+      },
+      "required": [ "timestamp", "maximumAllowedSizeBytes", "actualSizeBytes" ],
+      "additionalProperties": false
+    },
+    "payload": {
+      "type": "object",
+      "description": "The truncated collector payload that resulted in a size violation",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp at which the payload was collected",
+          "format": "date-time"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "IP address of the payload as detected by the collector"
+        },
+        "collector": {
+          "type": "string",
+          "description": "Collector identifier"
+        },
+        "userAgent": {
+          "type": [ "string", "null" ],
+          "description": "User agent of the payload as detected by the collector",
+          "maxLength": 4096
+        },
+        "refererUri": {
+          "type": [ "string", "null" ],
+          "description": "Referer of the payload as detected by the collector",
+          "maxLength": 8192
+        },
+        "path": {
+          "type": [ "string", "null" ],
+          "description": "Path requested by this collector payload",
+          "maxLength": 2048
+        },
+        "truncatedQueryString": {
+          "type": [ "string", "null" ],
+          "description": "Query string after truncation to fit the maximum payload size allowed"
+        },
+        "truncatedBody": {
+          "type": [ "string", "null" ],
+          "description": "Body after truncation to fit the maximum payload size allowed"
+        },
+        "headers": {
+          "type": [ "array", "null" ],
+          "description": "List of the headers part of this collector payload",
+          "items": {
+            "type": "string",
+            "maxLength": 8192
+          }
+        },
+        "contentType": {
+          "type": [ "string", "null" ],
+          "description": "Content type of the payload as detected by the collector",
+          "maxLength": 256
+        },
+        "hostname": {
+          "type": [ "string", "null" ],
+          "description": "Hostname of the payload as detected by the collector",
+          "maxLength": 8192
+        },
+        "networkUserId": {
+          "type": [ "string", "null" ],
+          "description": "Network user id associated with this payload",
+          "format": "uuid"
+        }
+      },
+      "required": [ "timestamp", "ipAddress", "collector" ],
+      "additionalProperties": false
+    },
+    "processor": {
+      "type": "object",
+      "description": "Information about the piece of software responsible for the creation of this size violation",
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "description": "Artifact responsible for the creation of this size violation",
+          "maxLength": 512
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the artifact responsible for the creation of this size violation",
+          "pattern": "^(\\d+\\.\\d+\\.\\d+.*)$",
+          "maxLength": 32
+        }
+      },
+      "required": [ "artifact", "version" ],
+      "additionalProperties": false
+    }
+  },
+  "required": [ "failure", "payload", "processor" ],
+  "additionalProperties": false
+}
