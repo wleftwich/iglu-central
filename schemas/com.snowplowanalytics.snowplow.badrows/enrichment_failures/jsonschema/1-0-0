@@ -1,0 +1,309 @@
+{
+  "$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+  "description": "Schema for a bad row resulting from enrichment failures",
+  "self": {
+    "vendor": "com.snowplowanalytics.snowplow.badrows",
+    "name": "enrichment_failures",
+    "format": "jsonschema",
+    "version": "1-0-0"
+  },
+  "type": "object",
+  "properties": {
+    "failure": {
+      "type": "object",
+      "description": "Information regarding the enrichment failures",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp at which the failure occurred",
+          "format": "date-time"
+        },
+        "messages": {
+          "type": "array",
+          "description": "List of failure messages associated with the enrichment failures",
+          "items": {
+            "type": "object",
+            "description": "Individual enrichment failure",
+            "properties": {
+              "enrichment": {
+                "type": "object",
+                "description": "Information needed to identify an enrichment",
+                "properties": {
+                  "vendor": {
+                    "type": "string",
+                    "description": "Vendor of the enrichment which produced this failure",
+                    "pattern": "^[a-zA-Z0-9-_.]+$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the enrichment which produced this failure",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                  },
+                  "format": {
+                    "type": "string",
+                    "description": "Format of the enrichment which produced this failure",
+                    "pattern": "^[a-zA-Z0-9-_]+$"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Version of the enrichment which produced this failure",
+                    "pattern": "^[0-9]+-[0-9]+-[0-9]+$"
+                  },
+                  "identifier": {
+                    "type": "string",
+                    "description": "Uniquely identifies the instance of of the enrichment which produced this failure",
+                    "maxLength": 256
+                  }
+                },
+                "required": [ "vendor", "name", "format", "version", "identifier" ],
+                "additionalProperties": false
+              },
+              "message": {
+                "type": "object",
+                "description": "Information about the failure that happened for this enrichment",
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "description": "Error which was internal to the enrichment regarding the enrichment's input data",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "description": "Field which did not meet the enrichment's expectations",
+                        "maxLength": 128
+                      },
+                      "value": {
+                        "type": [ "string", "null" ],
+                        "description": "Stringified representation of the value which did not meet the enrichment's expectations"
+                      },
+                      "expectation": {
+                        "type": "string",
+                        "description": "Description of the expectation which was not met"
+                      }
+                    },
+                    "required": ["field", "value", "expectation" ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "description": "Error which was internal to the enrichment regarding the enrichment's output data, this is a schema validation error",
+                    "properties": {
+                      "errors": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "description": "JSON Path to an issue in the faulty JSON Schema"
+                            },
+                            "message": {
+                              "type": "string",
+                              "description": "Human-readable message describing the issue with the schema"
+                            }
+                          },
+                          "required": [ "path", "message" ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [ "errors" ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "description": "Error which was external to the enrichment, e.g. a connection issue",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "description": "Error that occurred"
+                      }
+                    },
+                    "required": [ "error" ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [ "enrichment", "message" ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "description": "The payload that resulted in enrichment failures",
+      "properties": {
+        "trackerProtocolPayload": {
+          "type": "object",
+          "description": "The tracker protocol payload that resulted in enrichment failures",
+          "properties": {
+            "app_id": { "type": ["string", "null"] },
+            "platform": { "type": ["string", "null"] },
+            "etl_tstamp": {
+              "type": ["string", "null"],
+              "format": "date-time"
+            },
+            "collector_tstamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "dvce_created_tstamp": {
+              "type": ["string", "null"],
+              "format": "date-time"
+            },
+            "event": { "type": ["string", "null"] },
+            "event_id": { "type": "string" },
+            "txn_id": { "type": ["integer", "null"] },
+            "name_tracker": { "type": ["string", "null"] },
+            "v_tracker": { "type": ["string", "null"] },
+            "v_collector": { "type": "string" },
+            "v_etl": { "type": "string" },
+            "user_id": { "type": ["string", "null"] },
+            "user_ipaddress": { "type": ["string", "null"] },
+            "user_fingerprint": { "type": ["string", "null"] },
+            "domain_userid": { "type": ["string", "null"] },
+            "domain_sessionidx": { "type": ["integer", "null"] },
+            "network_userid": { "type": ["string", "null"] },
+            "page_url": { "type": ["string", "null"] },
+            "page_title": { "type": ["string", "null"] },
+            "page_referrer": { "type": ["string", "null"] },
+            "page_urlscheme": { "type": ["string", "null"] },
+            "page_urlhost": { "type": ["string", "null"] },
+            "page_urlport": { "type": ["integer", "null"] },
+            "page_urlpath": { "type": ["string", "null"] },
+            "page_urlquery": { "type": ["string", "null"] },
+            "page_urlfragment": { "type": ["string", "null"] },
+            "se_category": { "type": ["string", "null"] },
+            "se_action": { "type": ["string", "null"] },
+            "se_label": { "type": ["string", "null"] },
+            "se_property": { "type": ["string", "null"] },
+            "se_value": { "type": ["number", "null"] },
+            "tr_orderid": { "type": ["string", "null"] },
+            "tr_affiliation": { "type": ["string", "null"] },
+            "tr_total": { "type": ["number", "null"] },
+            "tr_tax": { "type": ["number", "null"] },
+            "tr_shipping": { "type": ["number", "null"] },
+            "tr_city": { "type": ["string", "null"] },
+            "tr_state": { "type": ["string", "null"] },
+            "tr_country": { "type": ["string", "null"] },
+            "ti_orderid": { "type": ["string", "null"] },
+            "ti_sku": { "type": ["string", "null"] },
+            "ti_name": { "type": ["string", "null"] },
+            "ti_category": { "type": ["string", "null"] },
+            "ti_price": { "type": ["number", "null"] },
+            "ti_quantity": { "type": ["integer", "null"] },
+            "pp_xoffset_min": { "type": ["integer", "null"] },
+            "pp_xoffset_max": { "type": ["integer", "null"] },
+            "pp_yoffset_min": { "type": ["integer", "null"] },
+            "pp_yoffset_max": { "type": ["integer", "null"] },
+            "useragent": { "type": ["string", "null"] },
+            "doc_charset": { "type": ["string", "null"] },
+            "doc_width": { "type": ["integer", "null"] },
+            "doc_height": { "type": ["integer", "null"] },
+            "tr_currency": { "type": ["string", "null"] },
+            "ti_currency": { "type": ["string", "null"] },
+            "etl_tags": { "type": ["string", "null"] },
+            "dvce_sent_tstamp": {
+              "type": ["string", "null"],
+              "format": "date-time"
+            },
+            "domain_sessionid": { "type": ["string", "null"] },
+            "derived_tstamp": { "type": ["string", "null"] },
+            "event_vendor": { "type": ["string", "null"] },
+            "event_name": { "type": ["string", "null"] },
+            "event_format": { "type": ["string", "null"] },
+            "event_version": { "type": ["string", "null"] },
+            "true_tstamp": {
+              "type": ["string", "null"],
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "collectorMetadata": {
+          "description": "The collector metadata that resulted in enrichment failures",
+          "properties": {
+            "timestamp": {
+              "type": "string",
+              "description": "Timestamp at which the payload was collected",
+              "format": "date-time"
+            },
+            "ipAddress": {
+              "type": "string",
+              "description": "IP address of the payload as detected by the collector"
+            },
+            "collector": {
+              "type": "string",
+              "description": "Collector identifier"
+            },
+            "userAgent": {
+              "type": [ "string", "null" ],
+              "description": "User agent of the payload as detected by the collector",
+              "maxLength": 4096
+            },
+            "refererUri": {
+              "type": [ "string", "null" ],
+              "description": "Referer of the payload as detected by the collector",
+              "maxLength": 8192
+            },
+            "path": {
+              "type": [ "string", "null" ],
+              "description": "Path requested by this collector payload",
+              "maxLength": 2048
+            },
+            "headers": {
+              "type": [ "array", "null" ],
+              "description": "List of the headers part of this collector payload",
+              "items": {
+                "type": "string",
+                "maxLength": 8192
+              }
+            },
+            "contentType": {
+              "type": [ "string", "null" ],
+              "description": "Content type of the payload as detected by the collector",
+              "maxLength": 256
+            },
+            "hostname": {
+              "type": [ "string", "null" ],
+              "description": "Hostname of the payload as detected by the collector",
+              "maxLength": 8192
+            },
+            "networkUserId": {
+              "type": [ "string", "null" ],
+              "description": "Network user id associated with this payload",
+              "format": "uuid"
+            }
+          },
+          "required": [ "timestamp", "ipAddress", "collector" ],
+          "additionalProperties": false
+        }
+      },
+      "required": [ "trackerProtocolPayload", "collectorMetadata" ],
+      "additionalProperties": false
+    },
+    "processor": {
+      "type": "object",
+      "description": "Information about the piece of software responsible for the creation of enrichment failures",
+      "properties": {
+        "artifact": {
+          "type": "string",
+          "description": "Artifact responsible for the creation of enrichment failures",
+          "maxLength": 512
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the artifact responsible for the creation of enrichment failures",
+          "pattern": "^(\\d+\\.\\d+\\.\\d+.*)$",
+          "maxLength": 32
+        }
+      },
+      "required": [ "artifact", "version" ],
+      "additionalProperties": false
+    }
+  },
+  "required": [ "failure", "payload", "processor" ],
+  "additionalProperties": false
+}
